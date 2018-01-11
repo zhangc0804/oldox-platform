@@ -1,1 +1,60 @@
 2018-01-11
+1、springboot的安装
+可以直接将jar包添加到classpath，也可以通过maven管理，推荐使用maven管理。
+<!-- Inherit defaults from Spring Boot -->
+<parent>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-parent</artifactId>
+	<version>1.5.4.RELEASE</version>
+</parent>
+<!-- Add typical dependencies for a web application -->
+<dependencies>
+	<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-web</artifactId>
+	</dependency>
+</dependencies>
+<!-- Package as an executable jar -->
+<build>
+	<plugins>
+		<plugin>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-maven-plugin</artifactId>
+		</plugin>
+	</plugins>
+</build>
+
+2、springboot应用启动
+可以直接运行main方法或者通过maven启动：mvn spring-boot:run
+
+2018-01-19
+构建系统：
+1、依赖管理
+每一个SpringBoot版本依赖了一个Spring框架版本，因此，不应该覆盖Spring框架版本
+
+2、Maven
+spring-boot-starter-parent工程提供了以下特性：
+JDK默认使用1.6
+源码编码默认为UTF-8
+提供了一个Dependency Management片段，因此可以省略<version>版本号
+智能化地资源文件过滤，如自动扫描配置文件application.properties、application.yml
+配置文件默认使用Spring风格的占位符${}
+
+3、修改Java版本
+<properties>
+	<java.version>1.8</java.version>
+</properties>
+
+4、使用SpringBoot的maven插件
+<build>
+	<plugins>
+		<plugin>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-maven-plugin</artifactId>
+		</plugin>
+	</plugins>
+</build>
+该插件可以将SpringBoot项目打包成一个可以执行的jar文件
+
+5、启动器（Starters）
+所有官方的启动器都是以spring-boot-starter开头，所有非官方的启动器都不是以spring-boot-starter开头
