@@ -58,3 +58,25 @@ JDK默认使用1.6
 
 5、启动器（Starters）
 所有官方的启动器都是以spring-boot-starter开头，所有非官方的启动器都不是以spring-boot-starter开头
+
+
+组织代码：
+以下是代码结构的一些最佳实践：
+1、不使用默认包
+默认包就是没有包声明，使用默认包可能会产生一些问题
+
+2、将主类放在包含其他类的根路径下，如下就是一个典型的项目结构：
+com
+	+- example
+		+- myproject
+			+- Application.java
+			|
+			+- domain
+			| 	+- Customer.java
+			| 	+- CustomerRepository.java
+			|
+			+- service
+			| 	+- CustomerService.java
+			|
+			+- web
+				+- CustomerController.java
