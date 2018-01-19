@@ -80,3 +80,12 @@ com
 			|
 			+- web
 				+- CustomerController.java
+				
+				
+配置类：
+SpringBoot支持XML配置，但是它更喜欢基于Java的配置。任何时候应该优先考虑基于Java的配置。
+1、导入额外的配置：
+不需要将所有的配置放到一个@Configuration类里，可以通过使用@Import注解添加额外的配置。作为选择，还可以使用
+@ComponentScan注解扫描Spring组件，这些组件包含@Configuration注解类。
+2、导入XML配置：
+如果不得不使用XML配置，仍然可以通过@Configuration类启动，同时使用@ImportReasource注解
