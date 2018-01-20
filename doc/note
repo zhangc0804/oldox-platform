@@ -89,3 +89,22 @@ SpringBoot支持XML配置，但是它更喜欢基于Java的配置。任何时候
 @ComponentScan注解扫描Spring组件，这些组件包含@Configuration注解类。
 2、导入XML配置：
 如果不得不使用XML配置，仍然可以通过@Configuration类启动，同时使用@ImportReasource注解
+
+2018-01-20
+自动配置
+1、可以通过使用@EnableAutoConfiguration或者@SpringBootApplication注解添加自动配置功能
+最佳实践：应该永远只添加一个@EnableAutoConfiguration注解，最好是放到主@Configuration类里
+
+2、覆盖自动配置
+自动配置时非侵入式的，任何时候，都可以添加自己的配置来覆盖默认的自动配置。比如，当添加一个DataBase Bean时，
+默认的内嵌DataBase将不起作用。
+
+可以在启动的时候添加--debug查看相关信息：spring-boot:run --debug
+
+3禁止指定的自动配置
+可以通过使用@EnableAutoConfiguration注解的exclude属性禁止指定的自动配置，例如：
+@Configuration
+@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
+public class MyConfiguration {
+}
+如果类不在classpath下，可以使用excludeName属性，此时需要指定类的全路径名
