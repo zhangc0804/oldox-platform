@@ -101,10 +101,63 @@ SpringBoot支持XML配置，但是它更喜欢基于Java的配置。任何时候
 
 可以在启动的时候添加--debug查看相关信息：spring-boot:run --debug
 
-3禁止指定的自动配置
+3、禁止指定的自动配置
 可以通过使用@EnableAutoConfiguration注解的exclude属性禁止指定的自动配置，例如：
 @Configuration
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 public class MyConfiguration {
 }
 如果类不在classpath下，可以使用excludeName属性，此时需要指定类的全路径名
+
+2018-01-29
+Spring bean和依赖注入
+1、如果代码结构使用的是推荐的结构，只需在主类上使用@ComponentScan注解，则@Controller、@Service、
+@Repository、@Component等注解会被自动扫描
+
+2、依赖注入可以通过构造器注入实现，如下所示：
+@Service
+public class DatabaseAccountService implements AccountService {
+	private final RiskAssessor riskAssessor;
+	@Autowired
+	public DatabaseAccountService(RiskAssessor riskAssessor) {
+		this.riskAssessor = riskAssessor;
+	}
+	// ...
+}
+
+
+使用@SpringBootApplication注解
+@SpringBootApplication = @Configuration + @EnableAutoConfiguration + @ComponentScan
+
+开发者工具
+1、添加依赖
+<dependencies>
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-devtools</artifactId>
+		<optional>true</optional>
+	</dependency>
+</dependencies>
+
+2、自动重启
+使用devtools时，classpath路径下的文件改动会导致应用重启；
+
+3、自动加载
+以下路径下的文件改动不会导致应用重启，但是会导致文件的重加载：
+/META-INFO/maven
+/META-INFO/resources
+/resources
+/static
+/public
+/templates
+如果要定制以上资源，可以在配置文件application.properties中指定以下属性：
+spring.devtools.restart.exclude=static/**,public/**
+
+4、禁用重启动
+在配置文件application.properties中指定以下属性：
+spring.devtools.restart.enabled = false
+或者：
+public static void main(String[] args) {
+	System.setProperty("spring.devtools.restart.enabled", "false");
+	SpringApplication.run(MyApp.class, args);
+}
