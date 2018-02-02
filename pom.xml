@@ -23,19 +23,23 @@
   </properties>
 
   <dependencies>
+  	<!-- Add the web environment -->
     <dependency>
     	<groupId>org.springframework.boot</groupId>
     	<artifactId>spring-boot-starter-web</artifactId>
     </dependency>
+    <!-- Add the boot devtools -->
     <dependency>
-    	<groupId>org.springframework.boot</groupId>
-    	<artifactId>spring-boot-starter-test</artifactId>
-    </dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-devtools</artifactId>
+		<optional>true</optional>
+	</dependency>
   </dependencies>
   
   <build>
   	<finalName>oldox-platform</finalName>
   	<plugins>
+  		<!-- Package the project as a executable jar -->
   		<plugin>
   			<groupId>org.springframework.boot</groupId>
   			<artifactId>spring-boot-maven-plugin</artifactId>
