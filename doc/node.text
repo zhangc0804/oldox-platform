@@ -26,3 +26,10 @@ public class Application {
 	}
 
 }
+1.4、添加dev-tool
+<!-- Add the boot devtools -->
+    <dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-devtools</artifactId>
+		<optional>true</optional>
+	</dependency>
