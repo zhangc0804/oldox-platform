@@ -33,10 +33,30 @@ public class Application {
 		<artifactId>spring-boot-devtools</artifactId>
 		<optional>true</optional>
 	</dependency>
-1.4、添加h2数据库驱动
+1.5、添加h2数据库驱动
 当满足以下条件时可以访问H2页面控制台：
 a、是一个web工程
 b、添加了h2的驱动jar包
 c、使用了dev-tools
 
 H2数据库页面控制台访问地址为：localhost:8080/h2-console/
+
+1.6、添加swagger
+1.6.1、添加swagger依赖
+<!-- Add swagger2 -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>${swagger2.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>${swagger2.version}</version>
+		</dependency>
+1.6.2、添加配置文件		
+@Configuration
+@EnableSwagger2
+public class SwaggerConfig 
+1.6.3、访问swagger页面
+http://localhost:8080/swagger-ui.html

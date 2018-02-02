@@ -1,55 +1,67 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.oldox</groupId>
-  <artifactId>oldox-platform</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
-  
-  <!-- Inherit defaults from Spring Boot -->
-  <parent>
-  	<groupId>org.springframework.boot</groupId>
-  	<artifactId>spring-boot-starter-parent</artifactId>
-  	<version>1.5.4.RELEASE</version>
-  </parent>
+	<groupId>com.oldox</groupId>
+	<artifactId>oldox-platform</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 
-  <name>oldox-platform</name>
-  <url>http://maven.apache.org</url>
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.version>1.7</java.version>
-  </properties>
-
-  <dependencies>
-  	<!-- Add the web environment -->
-    <dependency>
-    	<groupId>org.springframework.boot</groupId>
-    	<artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    <!-- Add the boot devtools -->
-    <dependency>
+	<!-- Inherit defaults from Spring Boot -->
+	<parent>
 		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-devtools</artifactId>
-		<optional>true</optional>
-	</dependency>
-	<!-- Database driver -->
-	<!-- H2 Database driver -->
-	<dependency>
-	  <groupId>com.h2database</groupId>
-	  <artifactId>h2</artifactId>
-	</dependency>
-  </dependencies>
-  
-  <build>
-  	<finalName>oldox-platform</finalName>
-  	<plugins>
-  		<!-- Package the project as a executable jar -->
-  		<plugin>
-  			<groupId>org.springframework.boot</groupId>
-  			<artifactId>spring-boot-maven-plugin</artifactId>
-  		</plugin>
-  	</plugins>
-  </build>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.4.RELEASE</version>
+	</parent>
+
+	<name>oldox-platform</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.7</java.version>
+		<swagger2.version>2.7.0</swagger2.version>
+	</properties>
+
+	<dependencies>
+		<!-- Add the web environment -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<!-- Add the boot devtools -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<!-- Database driver -->
+		<!-- H2 Database driver -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+		</dependency>
+		<!-- Add swagger2 -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>${swagger2.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>${swagger2.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>oldox-platform</finalName>
+		<plugins>
+			<!-- Package the project as a executable jar -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 </project>
