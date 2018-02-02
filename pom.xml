@@ -34,6 +34,12 @@
 		<artifactId>spring-boot-devtools</artifactId>
 		<optional>true</optional>
 	</dependency>
+	<!-- Database driver -->
+	<!-- H2 Database driver -->
+	<dependency>
+	  <groupId>com.h2database</groupId>
+	  <artifactId>h2</artifactId>
+	</dependency>
   </dependencies>
   
   <build>
