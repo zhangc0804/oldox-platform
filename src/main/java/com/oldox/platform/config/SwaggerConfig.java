@@ -15,6 +15,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggerConfig {
 
+	private static final String SWAGGER_API_INFO_TITLE = "Swagger2 RESTful APIs";
+	private static final String SWAGGER_API_INFO_VERSION = "1.0";
+
 	@Bean
 	public Docket createRestApi() {
 		return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select().apis(RequestHandlerSelectors.any())
@@ -22,7 +25,8 @@ public class SwaggerConfig {
 	}
 
 	private ApiInfo apiInfo() {
-		return new ApiInfoBuilder().title("Swagger2 RESTful APIs").version("1.0").build();
+		return new ApiInfoBuilder().title(SwaggerConfig.SWAGGER_API_INFO_TITLE)
+				.version(SwaggerConfig.SWAGGER_API_INFO_VERSION).build();
 	}
 
 }
