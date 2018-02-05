@@ -1,6 +1,10 @@
 package com.oldox.platform.config;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -89,13 +93,42 @@ public class DatabaseConfig implements EnvironmentAware {
 				environment.getProperty("spring.database.maxPoolPreparedStatementPerConnectionSize", Integer.class,
 						DatabaseConfig.SPRING_DATABASE_DEFAULT_MAX_POOL_PREPARED_STATEMENT_PER_CONNECTION_SIZE));
 		// 配置监控统计拦截的filters
-		// try {
-		// druidDataSource.setFilters(environment.getProperty("spring.database.filters"));
-		// } catch (SQLException e) {
-		// e.printStackTrace();
-		// }
+		try {
+			druidDataSource.setFilters(environment.getProperty("spring.database.filters",DatabaseConfig.SPRING_DATABASE_DEFAULT_FILTERS));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
 		return druidDataSource;
+	}
+	
+	@Bean
+	public ServletRegistrationBean druidStatViewServlet(){
+		ServletRegistrationBean druidStatViewServlet = new ServletRegistrationBean();
+		
+		druidStatViewServlet.setName("DruidStatView");
+		druidStatViewServlet.setServlet(new StatViewServlet());
+		
+		List<String> urlMappings = new ArrayList<String>();
+		urlMappings.add("/druid/*");
+		druidStatViewServlet.setUrlMappings(urlMappings);
+		
+		Map<String, String> initParameters = new HashMap<String, String>();
+		//允许清空统计数据
+		initParameters.put("resetEnable", "false");
+		//用户名
+//		initParameters.put("loginUsername", "root");
+		//密码
+//		initParameters.put("loginPassword", "123456");
+		//访问控制，规则如下：
+		//deny优先于allow，如果在deny列表中，就算在allow列表中，也会被拒绝。
+	    //如果allow没有配置或者为空，则允许所有访问
+		//另外需要注意，由于匹配规则不支持IPV6，配置了allow或者deny之后，会导致IPV6无法访问。
+//		initParameters.put("allow", "127.0.0.1");
+		initParameters.put("deny", "127.0.0.1");
+		druidStatViewServlet.setInitParameters(initParameters);
+		
+		return druidStatViewServlet;
 	}
 
 }
