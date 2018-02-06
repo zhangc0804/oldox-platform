@@ -63,3 +63,39 @@ http://localhost:8080/swagger-ui.html
 
 
 ################################################################2018-02-05
+Druid数据库连接池
+1、添加maven依赖
+		<!-- Add Alibaba druid database connection pool -->
+		<dependency>
+		    <groupId>com.alibaba</groupId>
+		    <artifactId>druid</artifactId>
+		    <version>${druid.version}</version>
+		</dependency>
+
+2、添加配置文件
+@Configuration
+public class DatabaseConfig implements EnvironmentAware
+
+3、编写资源配置文件（参考“数据库连接池配置”）
+application.properties
+
+4、配置监控统计拦截的filters
+		// try {
+		// druidDataSource.setFilters(environment.getProperty("spring.database.filters",DatabaseConfig.SPRING_DATABASE_DEFAULT_FILTERS));
+		// } catch (SQLException e) {
+		// e.printStackTrace();
+		// }
+		
+		//filters和proxyFilters属性是组合关系的，不是替换的
+		List<Filter> filters = new ArrayList<Filter>();
+		filters.add(wallFilter());
+		filters.add(statFilter());
+		druidDataSource.setProxyFilters(filters);
+		
+5、配置StatViewServlet
+	@Bean
+	public ServletRegistrationBean druidStatViewServlet() {
+	
+6、配置WebStatFilter
+	@Bean
+	public FilterRegistrationBean druidWebStatFilter(){
