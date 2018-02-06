@@ -21,6 +21,7 @@ import com.alibaba.druid.filter.stat.StatFilter;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
+import com.alibaba.druid.wall.WallFilter;
 
 @Configuration
 public class DatabaseConfig implements EnvironmentAware {
@@ -74,6 +75,20 @@ public class DatabaseConfig implements EnvironmentAware {
 				DatabaseConfig.SPRING_DATABASE_DEFAULT_LOG_SHOW_SQL));
 		return statFilter;
 	}
+	
+	@Bean
+	public WallFilter wallFilter(){
+		WallFilter wallFilter = new WallFilter();
+		
+		//刚开始引入WallFilter的时候，把logViolation设置为true，而throwException设置为false。
+		//就可以观察是否存在违规的情况，同时不影响业务运行。
+		
+		//对被认为是攻击的SQL进行LOG.error输出
+		wallFilter.setLogViolation(true);
+		//对被认为是攻击的SQL抛出SQLExcepton
+		wallFilter.setThrowException(false);
+		return wallFilter;
+	}
 
 	@Bean(initMethod = "init", destroyMethod = "close")
 	public DataSource dataSource() {
@@ -125,6 +140,7 @@ public class DatabaseConfig implements EnvironmentAware {
 		
 		//filters和proxyFilters属性是组合关系的，不是替换的
 		List<Filter> filters = new ArrayList<Filter>();
+		filters.add(wallFilter());
 		filters.add(statFilter());
 		druidDataSource.setProxyFilters(filters);
 
