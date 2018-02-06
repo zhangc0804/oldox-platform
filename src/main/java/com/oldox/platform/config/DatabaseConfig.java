@@ -9,14 +9,18 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
+import com.alibaba.druid.filter.Filter;
+import com.alibaba.druid.filter.stat.StatFilter;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.support.http.StatViewServlet;
+import com.alibaba.druid.support.http.WebStatFilter;
 
 @Configuration
 public class DatabaseConfig implements EnvironmentAware {
@@ -26,11 +30,11 @@ public class DatabaseConfig implements EnvironmentAware {
 	private static final int SPRING_DATABASE_DEFAULT_MIN_IDLE = 1;
 	private static final int SPRING_DATABASE_DEFAULT_MAX_ACTIVE = 20;
 
-	private static final long SPRING_DATABASE_DEFAULT_MAX_WAIT = 60000;
+	private static final long SPRING_DATABASE_DEFAULT_MAX_WAIT = 60000L;
 
-	private static final long SPRING_DATABASE_DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS = 60000;
+	private static final long SPRING_DATABASE_DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS = 60000L;
 
-	private static final long SPRING_DATABASE_DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS = 300000;
+	private static final long SPRING_DATABASE_DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS = 300000L;
 
 	private static final String SPRING_DATABASE_DEFAULT_VALIDATION_QUERY = "SELECT 'x'";
 
@@ -43,12 +47,32 @@ public class DatabaseConfig implements EnvironmentAware {
 
 	private static final String SPRING_DATABASE_DEFAULT_FILTERS = "stat";
 
+	private static final boolean SPRING_DATABASE_DEFAULT_MERGE_SQL = true;
+	private static final long SPRING_DATABASE_DEFAULT_SHOW_SQL_MILLIS = 3000L;
+	private static final boolean SPRING_DATABASE_DEFAULT_LOG_SHOW_SQL = true;
+
 	// 获取properties配置文件中的配置
 	private Environment environment;
 
 	@Override
 	public void setEnvironment(Environment environment) {
 		this.environment = environment;
+	}
+
+	@Bean
+	public StatFilter statFilter() {
+		StatFilter statFilter = new StatFilter();
+		// SQL合并配置
+		statFilter.setMergeSql(environment.getProperty("spring.database.mergeSql", Boolean.class,
+				DatabaseConfig.SPRING_DATABASE_DEFAULT_MERGE_SQL));
+		// 慢SQL记录
+		// slowSqlMillis用来配置SQL慢的标准，执行时间超过slowSqlMillis的就是慢
+		statFilter.setSlowSqlMillis(environment.getProperty("spring.database.slowSqlMillis", Long.class,
+				DatabaseConfig.SPRING_DATABASE_DEFAULT_SHOW_SQL_MILLIS));
+		// 通过日志输出执行慢的SQL
+		statFilter.setLogSlowSql(environment.getProperty("spring.database.logSlowSql", Boolean.class,
+				DatabaseConfig.SPRING_DATABASE_DEFAULT_LOG_SHOW_SQL));
+		return statFilter;
 	}
 
 	@Bean(initMethod = "init", destroyMethod = "close")
@@ -93,42 +117,77 @@ public class DatabaseConfig implements EnvironmentAware {
 				environment.getProperty("spring.database.maxPoolPreparedStatementPerConnectionSize", Integer.class,
 						DatabaseConfig.SPRING_DATABASE_DEFAULT_MAX_POOL_PREPARED_STATEMENT_PER_CONNECTION_SIZE));
 		// 配置监控统计拦截的filters
-		try {
-			druidDataSource.setFilters(environment.getProperty("spring.database.filters",DatabaseConfig.SPRING_DATABASE_DEFAULT_FILTERS));
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		// try {
+		// druidDataSource.setFilters(environment.getProperty("spring.database.filters",DatabaseConfig.SPRING_DATABASE_DEFAULT_FILTERS));
+		// } catch (SQLException e) {
+		// e.printStackTrace();
+		// }
+		
+		//filters和proxyFilters属性是组合关系的，不是替换的
+		List<Filter> filters = new ArrayList<Filter>();
+		filters.add(statFilter());
+		druidDataSource.setProxyFilters(filters);
 
 		return druidDataSource;
 	}
-	
+
 	@Bean
-	public ServletRegistrationBean druidStatViewServlet(){
+	public ServletRegistrationBean druidStatViewServlet() {
 		ServletRegistrationBean druidStatViewServlet = new ServletRegistrationBean();
-		
+
 		druidStatViewServlet.setName("DruidStatView");
 		druidStatViewServlet.setServlet(new StatViewServlet());
-		
+
 		List<String> urlMappings = new ArrayList<String>();
 		urlMappings.add("/druid/*");
 		druidStatViewServlet.setUrlMappings(urlMappings);
-		
+
 		Map<String, String> initParameters = new HashMap<String, String>();
-		//允许清空统计数据
-		initParameters.put("resetEnable", "false");
-		//用户名
-//		initParameters.put("loginUsername", "root");
-		//密码
-//		initParameters.put("loginPassword", "123456");
-		//访问控制，规则如下：
-		//deny优先于allow，如果在deny列表中，就算在allow列表中，也会被拒绝。
-	    //如果allow没有配置或者为空，则允许所有访问
-		//另外需要注意，由于匹配规则不支持IPV6，配置了allow或者deny之后，会导致IPV6无法访问。
-//		initParameters.put("allow", "127.0.0.1");
+		// 允许清空统计数据
+		initParameters.put("resetEnable", "true");
+		// 用户名
+		// initParameters.put("loginUsername", "root");
+		// 密码
+		// initParameters.put("loginPassword", "123456");
+		// 访问控制，规则如下：
+		// deny优先于allow，如果在deny列表中，就算在allow列表中，也会被拒绝。
+		// 如果allow没有配置或者为空，则允许所有访问
+		// 另外需要注意，由于匹配规则不支持IPV6，配置了allow或者deny之后，会导致IPV6无法访问。
+		// initParameters.put("allow", "127.0.0.1");
 		initParameters.put("deny", "127.0.0.1");
 		druidStatViewServlet.setInitParameters(initParameters);
-		
+
 		return druidStatViewServlet;
+	}
+	
+	@Bean
+	public FilterRegistrationBean druidWebStatFilter(){
+		FilterRegistrationBean druidWebStatFilter = new FilterRegistrationBean();
+		druidWebStatFilter.setFilter(new WebStatFilter());
+		druidWebStatFilter.setName("DruidWebStatFilter");
+		
+		List<String> urls = new ArrayList<String>();
+		urls.add("/*");
+		druidWebStatFilter.setUrlPatterns(urls);
+		
+		Map<String, String> initParameters = new HashMap<String, String>();
+		//排除一些不必要的url，比如*.js,/jslib/*等等
+		initParameters.put("exclusions", "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*");
+		//缺省sessionStatMaxCount是1000个。你可以按需要进行配置
+		initParameters.put("sessionStatMaxCount","1000");
+		//你可以关闭session统计功能
+		initParameters.put("sessionStatEnable","true");
+		//可以配置principalSessionName，使得druid能够知道当前的session的用户是谁
+		//根据需要，把其中的xxx.user修改为你user信息保存在session中的sessionName
+		//注意：如果你session中保存的是非string类型的对象，需要重载toString方法。
+//		initParameters.put("principalSessionName","xxx.user");
+		//如果你的user信息保存在cookie中，你可以配置principalCookieName，使得druid知道当前的user是谁
+		//根据需要，把其中的xxx.user修改为你user信息保存在cookie中的cookieName
+//		initParameters.put("principalCookieName","xxx.user");
+		//配置profileEnable能够监控单个url调用的sql列表。
+		initParameters.put("profileEnable","true");
+		druidWebStatFilter.setInitParameters(initParameters );
+		return druidWebStatFilter;
 	}
 
 }
