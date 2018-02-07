@@ -11,5 +11,11 @@ public interface UserMapper {
 	
 	@Select("select * from user where id= #{id}")
 	public User queryById(@Param("id") Long id);
+	
+	@Select("select * from user where username= #{username}")
+	public User queryByUsername(@Param("username") String username);
+	
+	@Select("select * from user where username= #{username} and password= #{password}")
+	public User queryByUsernamePassword(@Param("username") String username,@Param("password") String password);
 
 }

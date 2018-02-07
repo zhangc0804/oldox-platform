@@ -143,3 +143,24 @@ mybatis.type-handlers-package=com.example.typehandler
 mybatis.configuration.map-underscore-to-camel-case=true
 mybatis.configuration.default-fetch-size=100
 mybatis.configuration.default-statement-timeout=30
+
+################################################################2018-02-08
+整合Shiro
+1、添加依赖
+		<!-- Add shiro-spring-boot-web-starter -->
+		<dependency>
+		    <groupId>org.apache.shiro</groupId>
+		    <artifactId>shiro-spring-boot-web-starter</artifactId>
+		    <version>1.4.0</version>
+		</dependency>
+		
+2、编写Realm实现类
+public class SystemAuthorizingRealm extends AuthorizingRealm 
+
+3、将步骤2编写的Realm定义为bean
+	@Bean
+	public Realm realm(){
+		return new SystemAuthorizingRealm();
+	}
+
+注意：返回类型为Realm，不能为具体实现类，否则启动时会报错
